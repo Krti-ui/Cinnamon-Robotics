@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en" class="light scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinnamon Robotics | Modular Precision Hardware for Real Engineering</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cinnamon: {
+                            50: '#FFF7ED',
+                            100: '#FFEDD5',
+                            500: '#EA580C',
+                            600: '#C2410C',
+                            700: '#9A3412',
+                        },
+                        amber: {
+                            500: '#F59E0B',
+                        },
+                        surface: {
+                            base: '#FCFCFD',
+                            card: '#FFFFFF',
+                            muted: '#F8FAFC',
+                            border: '#E2E8F0',
+                            dark: '#0F172A',
+                        },
+                        ink: {
+                            primary: '#0F172A',
+                            secondary: '#475569',
+                            muted: '#94A3B8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.18/dist/lenis.css">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FCFCFD;
+            color: #0F172A;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Micro Grid Background inspired by Teenage Engineering */
+        .bg-grid {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+        }
+
+        /* Minimalist Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FCFCFD;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Technical Mono Labels */
+        .tech-spec {
+            font-family: 'Fira Code', monospace;
+            letter-spacing: -0.02em;
+        }
+
+        /* Smooth drawer & modal transitions */
+        .drawer-overlay {
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .drawer-content {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .pulse-badge {
+            box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4);
+            animation: pulse-ring 2s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(234, 88, 12, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
+        }
+    </style>
+</head>
+<body class="bg-surface-base text-ink-primary antialiased selection:bg-cinnamon-500 selection:text-white">
+
+    <!-- NAVIGATION BAR -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-surface-base/85 backdrop-blur-md border-b border-surface-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded-lg bg-surface-dark text-white flex items-center justify-center font-mono font-bold text-sm group-hover:bg-cinnamon-500 transition-colors shadow-sm">
+                    CR
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold tracking-tight text-sm uppercase text-ink-primary">CINNAMON</span>
+                    <span class="text-[10px] text-ink-muted -mt-1 font-mono">ROBOTICS v2.4</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-ink-secondary">
+                <a href="#philosophy" class="hover:text-cinnamon-500 transition-colors">Philosophy</a>
+                <a href="#hardware" class="hover:text-cinnamon-500 transition-colors">Hardware Specs</a>
+                <a href="#software" class="hover:text-cinnamon-500 transition-colors">Software & ROS 2</a>
+                <a href="#store" class="hover:text-cinnamon-500 transition-colors">Hardware Catalog</a>
+            </nav>
+
+            <!-- Actions & Cart Button -->
+            <div class="flex items-center gap-3">
+                <button id="cart-btn" class="relative p-2 rounded-lg border border-surface-border bg-white hover:border-ink-muted text-ink-primary transition-all flex items-center gap-2 text-sm font-medium shadow-sm">
+                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Cart</span>
+                    <span id="cart-count" class="w-5 h-5 rounded-full bg-cinnamon-500 text-white text-[11px] font-mono font-bold flex items-center justify-center">0</span>
+                </button>
+                <a href="#store" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-dark text-white text-sm font-medium hover:bg-cinnamon-500 transition-colors shadow-sm">
+                    Order Hardware
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 bg-grid border-b border-surface-border overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <!-- Left Hero Content -->
+                <div class="lg:col-span-7 space-y-6 hero-anim">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cinnamon-500/30 bg-cinnamon-50 text-cinnamon-600 text-xs font-mono">
+                        <span class="w-2 h-2 rounded-full bg-cinnamon-500 pulse-badge"></span>
+                        BRIDGING TIER-2/3 HARDWARE EDUCATION
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-ink-primary leading-[1.1]">
+                        Tactile robotics. <br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cinnamon-500 to-amber-500">Not AI vibe coding.</span>
+                    </h1>
+                    <p class="text-lg text-ink-secondary max-w-xl font-normal leading-relaxed">
+                        Master physical kinematics, power bus isolation, and joint transformation from first principles with precision 4-DOF & 5-DOF educational platforms built for engineering rigor.
+                    </p>
+
+                    <!-- CTAs & Actions -->
+                    <div class="pt-2 flex flex-wrap items-center gap-4">
+                        <a href="#store" class="px-6 py-3 rounded-lg bg-cinnamon-500 hover:bg-cinnamon-600 text-white font-medium text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                            Explore Hardware Catalog
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                        </a>
+                        <a href="#software" class="px-6 py-3 rounded-lg border border-surface-border bg-white hover:bg-surface-muted text-ink-primary font-medium text-sm transition-all flex items-center gap-2 shadow-sm">
+                            <i data-lucide="terminal" class="w-4 h-4 text-ink-muted"></i>
+                            Python & ROS 2 Workstation
+                        </a>
+                    </div>
+
+                    <!-- Key Metrics Bar -->
+                    <div class="pt-8 border-t border-surface-border grid grid-cols-3 gap-6 text-left">
+                        <div>
+                            <div class="text-2xl font-extrabold font-mono text-ink-primary">35+</div>
+                            <div class="text-xs text-ink-muted uppercase tracking-wider font-mono">Kits Deployed</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-extrabold font-mono text-ink-primary">5-DOF</div>
+                            <div class="text-xs text-ink-muted uppercase tracking-wider font-mono">Kinematics Arm</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-extrabold font-mono text-ink-primary">₹8,499</div>
+                            <div class="text-xs text-ink-muted uppercase tracking-wider font-mono">Starter Pricing</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Interactive Schematics Graphic -->
+                <div class="lg:col-span-5 hero-anim">
+                    <div class="bg-white rounded-2xl border border-surface-border p-6 shadow-xl relative overflow-hidden group">
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-surface-border">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                <span class="font-mono text-xs font-semibold text-ink-primary">CINNAMON 5-DOF SCHEMATIC</span>
+                            </div>
+                            <div class="font-mono text-[11px] text-ink-muted bg-surface-muted px-2 py-0.5 rounded">
+                                PCA9685 ACTIVE
+                            </div>
+                        </div>
+
+                        <!-- Technical SVG Blueprint Vector -->
+                        <div class="w-full h-80 flex items-center justify-center relative bg-surface-base rounded-xl border border-surface-border p-4">
+                            <svg viewBox="0 0 400 300" class="w-full h-full max-w-sm drop-shadow-md">
+                                <pattern id="heroGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#E2E8F0" stroke-width="0.8"/>
+                                </pattern>
+                                <rect width="100%" height="100%" fill="url(#heroGrid)" />
+
+                                <!-- Base Frame -->
+                                <rect x="150" y="240" width="100" height="20" rx="4" fill="#0F172A" />
+                                <circle cx="200" cy="240" r="14" fill="#EA580C" />
+
+                                <!-- Link 1 (Base to Shoulder): 11.5cm -->
+                                <line x1="200" y1="240" x2="200" y2="160" stroke="#0F172A" stroke-width="12" stroke-linecap="round" />
+                                <line x1="200" y1="240" x2="200" y2="160" stroke="#F59E0B" stroke-width="4" stroke-linecap="round" />
+                                <circle cx="200" cy="160" r="10" fill="#0F172A" />
+
+                                <!-- Link 2 (Upper Arm): 9.5cm -->
+                                <line x1="200" y1="160" x2="270" y2="100" stroke="#0F172A" stroke-width="10" stroke-linecap="round" />
+                                <line x1="200" y1="160" x2="270" y2="100" stroke="#EA580C" stroke-width="3" stroke-linecap="round" />
+                                <circle cx="270" cy="100" r="8" fill="#0F172A" />
+
+                                <!-- Link 3 (Forearm/End Effector): 5.0cm -->
+                                <line x1="270" y1="100" x2="310" y2="80" stroke="#0F172A" stroke-width="8" stroke-linecap="round" />
+                                <path d="M 310 70 L 325 80 L 310 90" fill="none" stroke="#EA580C" stroke-width="3" stroke-linecap="round" />
+
+                                <!-- Dimension Annotations -->
+                                <text x="160" y="200" class="tech-spec text-[10px]" fill="#64748B">L1: 11.5cm</text>
+                                <text x="215" y="120" class="tech-spec text-[10px]" fill="#64748B">L2: 9.5cm</text>
+                                <text x="280" y="70" class="tech-spec text-[10px]" fill="#EA580C">L3: 5.0cm</text>
+                            </svg>
+                        </div>
+
+                        <!-- Card Spec Footer -->
+                        <div class="mt-4 flex items-center justify-between text-xs font-mono text-ink-secondary">
+                            <div>
+                                <span class="text-ink-muted">Kinematics:</span> <span class="text-cinnamon-500 font-semibold">Analytical IK Solver</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Serial 115200 Baud
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHILOSOPHY / PEDAGOGY SECTION -->
+    <section id="philosophy" class="py-24 bg-white border-b border-surface-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto text-center space-y-4 mb-16 section-head">
+                <span class="text-cinnamon-500 font-mono text-xs font-bold uppercase tracking-widest">Our Engineering Pedagogy</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink-primary">
+                    Hardware intuition built through tactile, mistake-based learning.
+                </h2>
+                <p class="text-ink-secondary text-base leading-relaxed">
+                    Generic simulator code hides physical friction, current stalls, and gear backlash. Cinnamon Robotics empowers tier-2/3 institutions with real physical hardware and complete diagnostic transparency.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="p-8 rounded-2xl bg-surface-base border border-surface-border hover:border-cinnamon-500/50 transition-all duration-300 shadow-sm hover:shadow-md">
+                    <div class="w-12 h-12 rounded-xl bg-cinnamon-50 text-cinnamon-500 flex items-center justify-center mb-6">
+                        <i data-lucide="zap" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-ink-primary mb-2">Dual Isolated Power Rails</h3>
+                    <p class="text-sm text-ink-secondary leading-relaxed">
+                        Understand why microcontrollers brown out when servos turn under load. Separate 5V logic and PCA9685 high-draw servo power rails teach power integrity.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="p-8 rounded-2xl bg-surface-base border border-surface-border hover:border-cinnamon-500/50 transition-all duration-300 shadow-sm hover:shadow-md">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center mb-6">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-ink-primary mb-2">Inverse Kinematics (IK)</h3>
+                    <p class="text-sm text-ink-secondary leading-relaxed">
+                        Convert cartesian coordinate target points $(X, Y, Z)$ into physical servo PWM duty cycles using trigonometric transformations and matrix algebra.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="p-8 rounded-2xl bg-surface-base border border-surface-border hover:border-cinnamon-500/50 transition-all duration-300 shadow-sm hover:shadow-md">
+                    <div class="w-12 h-12 rounded-xl bg-surface-dark text-white flex items-center justify-center mb-6">
+                        <i data-lucide="box" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-ink-primary mb-2">ROS 2 & MoveIt Workstation</h3>
+                    <p class="text-sm text-ink-secondary leading-relaxed">
+                        Export URDF model files directly into Robot Operating System (ROS 2), enabling trajectory planning and digital twin simulation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HARDWARE & SOFTWARE TECHNICAL SPECS -->
+    <section id="hardware" class="py-24 bg-surface-base border-b border-surface-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Specs Breakdown -->
+                <div class="lg:col-span-6 space-y-8">
+                    <div>
+                        <span class="text-cinnamon-500 font-mono text-xs font-bold uppercase tracking-widest">Hardware Architecture</span>
+                        <h2 class="text-3xl font-extrabold text-ink-primary mt-2">Precision engineered down to the millimeter.</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-xl bg-white border border-surface-border flex items-start gap-4 shadow-sm">
+                            <div class="p-2.5 rounded-lg bg-surface-muted text-ink-primary font-mono text-xs font-bold">01</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-ink-primary">Link Geometry Dimensions</h4>
+                                <p class="text-xs text-ink-secondary font-mono mt-1">L1 Base-to-Shoulder: 11.5cm | L2 Upper Arm: 9.5cm | L3 Forearm/Effector: 5.0cm</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-white border border-surface-border flex items-start gap-4 shadow-sm">
+                            <div class="p-2.5 rounded-lg bg-surface-muted text-ink-primary font-mono text-xs font-bold">02</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-ink-primary">Embedded Electronics Topology</h4>
+                                <p class="text-xs text-ink-secondary font-mono mt-1">Arduino Uno microcontroller coupled with PCA9685 16-Channel 12-bit PWM shield over $I^2C$ bus.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-white border border-surface-border flex items-start gap-4 shadow-sm">
+                            <div class="p-2.5 rounded-lg bg-surface-muted text-ink-primary font-mono text-xs font-bold">03</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-ink-primary">Real-World Institutional Impact</h4>
+                                <p class="text-xs text-ink-secondary font-mono mt-1">35+ kits deployed across collegiate engineering labs and applied satellite/automotive control projects.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Software Code Snippet Interactive Box -->
+                <div id="software" class="lg:col-span-6">
+                    <div class="bg-surface-dark rounded-2xl p-6 text-white shadow-2xl font-mono text-xs border border-slate-800">
+                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800 text-slate-400">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                                <span class="ml-2 text-xs text-slate-300">cinnamon_ik_solver.py</span>
+                            </div>
+                            <span class="text-[10px] text-cinnamon-500 font-semibold">Python 3.11 / ROS 2</span>
+                        </div>
+
+                        <pre class="text-slate-300 leading-relaxed overflow-x-auto">
+<span class="text-purple-400">import</span> math
+<span class="text-purple-400">from</span> cinnamon_robotics <span class="text-purple-400">import</span> ArmController
+
+<span class="text-slate-500"># Exact Link dimensions in centimeters</span>
+L1, L2, L3 = <span class="text-amber-500">11.5</span>, <span class="text-amber-500">9.5</span>, <span class="text-amber-500">5.0</span>
+
+<span class="text-purple-400">def</span> <span class="text-blue-400">solve_inverse_kinematics</span>(x, y, z):
+    <span class="text-slate-500">"""Calculates joint angle degrees for cartesian goal"""</span>
+    theta1 = math.atan2(y, x)
+    r = math.sqrt(x**2 + y**2)
+    z_eff = z - L1
+    
+    d = math.sqrt(r**2 + z_eff**2)
+    cos_theta2 = (L2**2 + d**2 - L3**2) / (<span class="text-amber-500">2</span> * L2 * d)
+    theta2 = math.atan2(z_eff, r) + math.acos(cos_theta2)
+    
+    <span class="text-purple-400">return</span> [math.degrees(theta1), math.degrees(theta2)]
+
+arm = ArmController(port=<span class="text-emerald-400">"/dev/ttyUSB0"</span>, baud=<span class="text-amber-500">115200</span>)
+arm.move_to_cartesian(x=<span class="text-amber-500">12.0</span>, y=<span class="text-amber-500">8.5</span>, z=<span class="text-amber-500">10.0</span>)</pre>
+
+                        <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                            <span class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i> IK Solution Converged</span>
+                            <span class="text-cinnamon-500">MoveIt Planner Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- STORE & PRODUCT CATALOG SECTION -->
+    <section id="store" class="py-24 bg-white border-b border-surface-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                <div>
+                    <span class="text-cinnamon-500 font-mono text-xs font-bold uppercase tracking-widest">Hardware Portal</span>
+                    <h2 class="text-3xl font-extrabold text-ink-primary mt-1">Hardware Kits & Technical Add-ons</h2>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="mt-4 md:mt-0 flex flex-wrap items-center gap-2 bg-surface-base p-1.5 rounded-xl border border-surface-border font-mono text-xs">
+                    <button data-filter="all" class="filter-btn px-3 py-1.5 rounded-lg bg-white shadow-sm font-semibold text-ink-primary border border-surface-border">All Products</button>
+                    <button data-filter="kits" class="filter-btn px-3 py-1.5 rounded-lg text-ink-secondary hover:text-ink-primary">Hardware Kits</button>
+                    <button data-filter="components" class="filter-btn px-3 py-1.5 rounded-lg text-ink-secondary hover:text-ink-primary">Components</button>
+                    <button data-filter="software" class="filter-btn px-3 py-1.5 rounded-lg text-ink-secondary hover:text-ink-primary">Software & Add-ons</button>
+                </div>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="product-grid">
+                <!-- Dynamically Populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-surface-base py-12 border-t border-surface-border font-mono text-xs text-ink-secondary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-lg bg-surface-dark text-white flex items-center justify-center font-bold text-xs">CR</div>
+                <span>© 2026 Cinnamon Robotics Inc. All rights reserved.</span>
+            </div>
+            <div class="flex items-center gap-6 text-ink-secondary">
+                <a href="#philosophy" class="hover:text-cinnamon-500 transition-colors">Philosophy</a>
+                <a href="#hardware" class="hover:text-cinnamon-500 transition-colors">Hardware Specs</a>
+                <a href="#software" class="hover:text-cinnamon-500 transition-colors">Software & ROS 2</a>
+                <a href="#store" class="hover:text-cinnamon-500 transition-colors">Store Portal</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SLIDE-OVER CART DRAWER -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 pointer-events-none">
+        <!-- Backdrop -->
+        <div id="cart-backdrop" class="drawer-overlay absolute inset-0 bg-black/40 opacity-0 pointer-events-none"></div>
+
+        <!-- Drawer Panel -->
+        <div id="cart-content" class="drawer-content absolute top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-2xl border-l border-surface-border transform translate-x-full pointer-events-auto flex flex-col">
+            <!-- Drawer Header -->
+            <div class="p-6 border-b border-surface-border flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shopping-bag" class="w-5 h-5 text-cinnamon-500"></i>
+                    <h3 class="font-bold text-base text-ink-primary">Hardware Cart</h3>
+                </div>
+                <button id="close-cart-btn" class="p-2 text-ink-muted hover:text-ink-primary rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Free Shipping Progress Bar -->
+            <div class="px-6 py-3 bg-surface-muted border-b border-surface-border text-xs">
+                <div class="flex justify-between font-mono text-ink-secondary mb-1.5">
+                    <span id="shipping-progress-text">Free Shipping Progress</span>
+                    <span id="shipping-progress-val" class="font-bold text-cinnamon-500">₹0 / ₹10,000</span>
+                </div>
+                <div class="w-full h-1.5 bg-surface-border rounded-full overflow-hidden">
+                    <div id="shipping-progress-bar" class="h-full bg-cinnamon-500 w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <!-- Dynamically rendered -->
+            </div>
+
+            <!-- Drawer Footer -->
+            <div class="p-6 border-t border-surface-border bg-surface-base space-y-4">
+                <div class="space-y-2 font-mono text-xs">
+                    <div class="flex justify-between text-ink-secondary">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">₹0</span>
+                    </div>
+                    <div class="flex justify-between text-ink-secondary">
+                        <span>Shipping</span>
+                        <span id="cart-shipping-cost" class="text-emerald-600 font-semibold">Free</span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-ink-primary pt-2 border-t border-surface-border">
+                        <span>Total Amount</span>
+                        <span id="cart-total">₹0</span>
+                    </div>
+                </div>
+
+                <button id="checkout-btn" class="w-full py-3 rounded-xl bg-cinnamon-500 hover:bg-cinnamon-600 text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2">
+                    Proceed to Checkout
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK VIEW MODAL -->
+    <div id="quick-view-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="quick-view-card" class="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-surface-border relative transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+            <button id="close-quickview-btn" class="absolute top-4 right-4 p-2 text-ink-muted hover:text-ink-primary">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div id="quick-view-content" class="space-y-6">
+                <!-- Dynamically rendered by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="checkout-card" class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-surface-border relative transform scale-95 transition-transform duration-300">
+            <button id="close-checkout-btn" class="absolute top-4 right-4 p-2 text-ink-muted hover:text-ink-primary">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div id="checkout-modal-body" class="space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cinnamon-50 text-cinnamon-500 flex items-center justify-center font-bold">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-ink-primary">Institutional Order Checkout</h3>
+                        <p class="text-xs text-ink-secondary font-mono">Cinnamon Robotics Express Terminal</p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-surface-base border border-surface-border text-xs space-y-2 font-mono">
+                    <div class="flex justify-between">
+                        <span class="text-ink-muted">Order Ref:</span>
+                        <span class="font-bold text-ink-primary" id="checkout-ref">CR-2026-8891</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-ink-muted">Order Total:</span>
+                        <span class="font-bold text-cinnamon-500" id="checkout-total-display">₹0</span>
+                    </div>
+                </div>
+
+                <form id="checkout-form" onsubmit="handleOrderSubmit(event)" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block font-semibold text-ink-primary mb-1">Institution / Department Name</label>
+                        <input type="text" required placeholder="IIT / NIT / College Robotics Lab" class="w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base focus:outline-none focus:border-cinnamon-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-ink-primary mb-1">Shipping Address</label>
+                        <textarea required rows="2" placeholder="Lab 402, Block B, Campus Drive..." class="w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base focus:outline-none focus:border-cinnamon-500 font-mono"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-ink-primary mb-1">Payment Method</label>
+                        <select class="w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base font-mono">
+                            <option>Educational Purchase Order (PO)</option>
+                            <option>Institutional Credit Card</option>
+                            <option>UPI / Direct Bank Transfer</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 mt-2 rounded-xl bg-cinnamon-500 hover:bg-cinnamon-600 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 shadow-md">
+                        Confirm Purchase Order
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION LOGIC & INTERACTION ENGINE -->
+    <script>
+        // RICH PRODUCT CATALOG (8 DISTINCT REALISTIC PRODUCTS)
+        const PRODUCTS = [
+            {
+                id: 1,
+                name: "Cinnamon 5-DOF Robotic Arm Standard Kit",
+                price: 8499,
+                category: "kits",
+                tag: "Flagship",
+                icon: "bot",
+                desc: "Complete 5 Degrees-of-Freedom kit with precision servos, pre-cut PETG link frames (11.5cm + 9.5cm + 5cm), Arduino Uno, and PCA9685 driver shield.",
+                specs: "Includes: Arduino Uno, PCA9685 16-ch I2C shield, 5x Metal Gear Servos, 5V 5A Power Adapter, Cables & FK/IK Python source code."
+            },
+            {
+                id: 2,
+                name: "ROS 2 & MoveIt Workstation Bundle",
+                price: 12999,
+                category: "software",
+                tag: "Advanced",
+                icon: "box",
+                desc: "Pre-configured Ubuntu ROS 2 environment with full URDF kinematic models, RViz digital twin, and MoveIt trajectory planning modules.",
+                specs: "Includes: Cinnamon 5-DOF Arm, ROS 2 Humble/Jazzy workspace, URDF config, MoveIt 2 setup package, USB-Serial bridge."
+            },
+            {
+                id: 3,
+                name: "Institutional Lab Multi-Pack (5x Kits)",
+                price: 39999,
+                category: "kits",
+                tag: "Bulk Deal",
+                icon: "layers",
+                desc: "Designed specifically for engineering college labs. Contains 5 complete 5-DOF robotic arms with spare components and instructor teaching manuals.",
+                specs: "Includes: 5x Full Arms, 2x Spare Servo Packs, 5x Power Supplies, Master Classroom Python GUI License & Curriculum PPTs."
+            },
+            {
+                id: 4,
+                name: "High-Torque Metal Gear Servo Expansion Pack",
+                price: 1899,
+                category: "components",
+                tag: "Upgrade",
+                icon: "zap",
+                desc: "Set of 3 upgraded high-torque metal-gear servos engineered for base rotation and high-load shoulder joints.",
+                specs: "Torque: 13.5 kg-cm @ 6V, Full Brass/Steel Gears, Dual Ball Bearing outputs."
+            },
+            {
+                id: 5,
+                name: "PCA9685 + Isolated Power Module",
+                price: 799,
+                category: "components",
+                tag: "Electronics",
+                icon: "cpu",
+                desc: "16-Channel 12-bit PWM driver shield with built-in power rail isolation and reverse-polarity diode protection.",
+                specs: "I2C interface (0x40 default), dual terminal block inputs up to 12V 10A, noise bypass capacitors."
+            },
+            {
+                id: 6,
+                name: "Soft-Gripper & Custom End-Effector Set",
+                price: 1249,
+                category: "components",
+                tag: "Add-on",
+                icon: "hand",
+                desc: "Pneumatic/servo-actuated soft robotic gripper set for handling fragile objects in research applications.",
+                specs: "Compatible with Link 3 wrist connector, silicone soft fingers, quick-release mounting screws."
+            },
+            {
+                id: 7,
+                name: "Kinematics Vision Camera Mount Module",
+                price: 1499,
+                category: "software",
+                tag: "Vision",
+                icon: "camera",
+                desc: "Eye-in-hand camera mount and OpenCV pick-and-place tracking script for object detection and visual servoing.",
+                specs: "HD 1080p camera module, custom end-effector mount, OpenCV Python color-tracking code included."
+            },
+            {
+                id: 8,
+                name: "3D Printed Link Arm Frame Spare Kit",
+                price: 999,
+                category: "components",
+                tag: "Spare",
+                icon: "wrench",
+                desc: "Replacement PETG high-density 3D printed mechanical link arm set (11.5cm, 9.5cm, 5cm) with metal bearings.",
+                specs: "High temperature PETG polymer, pre-inserted brass threaded inserts, radial bearings."
+            }
+        ];
+
+        // Global Cart State
+        let cart = [];
+
+        // DOM Elements
+        const productGrid = document.getElementById('product-grid');
+        const cartBtn = document.getElementById('cart-btn');
+        const closeCartBtn = document.getElementById('close-cart-btn');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartBackdrop = document.getElementById('cart-backdrop');
+        const cartContent = document.getElementById('cart-content');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartCountEl = document.getElementById('cart-count');
+        const cartSubtotalEl = document.getElementById('cart-subtotal');
+        const cartTotalEl = document.getElementById('cart-total');
+        const shippingProgressBar = document.getElementById('shipping-progress-bar');
+        const shippingProgressVal = document.getElementById('shipping-progress-val');
+        
+        const quickViewModal = document.getElementById('quick-view-modal');
+        const quickViewCard = document.getElementById('quick-view-card');
+        const quickViewContent = document.getElementById('quick-view-content');
+        const closeQuickviewBtn = document.getElementById('close-quickview-btn');
+
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const checkoutModal = document.getElementById('checkout-modal');
+        const checkoutCard = document.getElementById('checkout-card');
+        const closeCheckoutBtn = document.getElementById('close-checkout-btn');
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            // Safely initialize Lucide icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+            // Render Products
+            renderProducts(PRODUCTS);
+
+            // Setup Filter Buttons
+            setupFilters();
+
+            // Setup Event Listeners
+            cartBtn.addEventListener('click', () => toggleCart(true));
+            closeCartBtn.addEventListener('click', () => toggleCart(false));
+            cartBackdrop.addEventListener('click', () => toggleCart(false));
+
+            closeQuickviewBtn.addEventListener('click', closeQuickView);
+            closeCheckoutBtn.addEventListener('click', closeCheckout);
+            checkoutBtn.addEventListener('click', openCheckout);
+
+            // Safe Lenis Smooth Scroll Setup
+            if (window.Lenis) {
+                const lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    smoothWheel: true
+                });
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+                requestAnimationFrame(raf);
+            }
+
+            // Safe GSAP Animations
+            if (window.gsap && window.ScrollTrigger) {
+                gsap.registerPlugin(ScrollTrigger);
+
+                gsap.from(".hero-anim", {
+                    opacity: 0,
+                    y: 30,
+                    duration: 1,
+                    stagger: 0.2,
+                    ease: "power3.out"
+                });
+
+                gsap.from(".section-head", {
+                    scrollTrigger: {
+                        trigger: ".section-head",
+                        start: "top 80%"
+                    },
+                    opacity: 0,
+                    y: 20,
+                    duration: 0.8
+                });
+            }
+        });
+
+        // RENDER PRODUCTS
+        function renderProducts(productList) {
+            productGrid.innerHTML = productList.map(p => `
+                <div class="product-card group rounded-2xl border border-surface-border bg-white overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col justify-between" data-category="${p.category}">
+                    <div>
+                        <div class="aspect-video bg-surface-base relative flex items-center justify-center border-b border-surface-border p-4">
+                            <span class="absolute top-3 left-3 bg-surface-dark text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">
+                                ${p.tag}
+                            </span>
+                            <div class="w-14 h-14 rounded-2xl bg-white border border-surface-border flex items-center justify-center text-cinnamon-500 shadow-sm group-hover:scale-110 transition-transform">
+                                <i data-lucide="${p.icon}" class="w-7 h-7"></i>
+                            </div>
+                        </div>
+
+                        <div class="p-5 space-y-3">
+                            <div class="flex justify-between items-start gap-2">
+                                <h3 class="font-bold text-sm text-ink-primary line-clamp-1">${p.name}</h3>
+                            </div>
+                            <p class="text-xs text-ink-secondary line-clamp-2 leading-relaxed">${p.desc}</p>
+                        </div>
+                    </div>
+
+                    <div class="p-5 pt-0 space-y-3">
+                        <div class="flex items-center justify-between border-t border-surface-border pt-3">
+                            <span class="text-xs text-ink-muted font-mono">Price</span>
+                            <span class="font-mono font-bold text-base text-ink-primary">₹${p.price.toLocaleString('en-IN')}</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="openQuickView(${p.id})" class="py-2 px-3 rounded-lg border border-surface-border bg-surface-base hover:bg-surface-muted text-ink-primary font-mono text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Specs
+                            </button>
+                            <button onclick="addToCart(${p.id})" class="py-2 px-3 rounded-lg bg-cinnamon-500 hover:bg-cinnamon-600 text-white font-mono text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-sm">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // FILTER SETUP
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-white', 'shadow-sm', 'font-semibold', 'text-ink-primary', 'border', 'border-surface-border');
+                        b.classList.add('text-ink-secondary');
+                    });
+
+                    e.target.classList.add('bg-white', 'shadow-sm', 'font-semibold', 'text-ink-primary', 'border', 'border-surface-border');
+
+                    const filter = e.target.dataset.filter;
+                    if (filter === 'all') {
+                        renderProducts(PRODUCTS);
+                    } else {
+                        const filtered = PRODUCTS.filter(p => p.category === filter);
+                        renderProducts(filtered);
+                    }
+                });
+            });
+        }
+
+        // CART LOGIC
+        function addToCart(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = cart.find(i => i.id === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartUI();
+            toggleCart(true);
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            // Update Cart Count
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountEl.textContent = totalCount;
+
+            // Calculate Subtotal
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartSubtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+            cartTotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+
+            // Free Shipping Progress (Threshold ₹10,000)
+            const target = 10000;
+            const progress = Math.min(100, (subtotal / target) * 100);
+            shippingProgressBar.style.width = `${progress}%`;
+            shippingProgressVal.textContent = `₹${subtotal.toLocaleString('en-IN')} / ₹10,000`;
+
+            // Render Cart Items
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="text-center py-16 text-ink-muted space-y-3">
+                        <i data-lucide="shopping-bag" class="w-12 h-12 mx-auto opacity-30"></i>
+                        <p class="text-sm font-medium">Your hardware cart is empty.</p>
+                        <p class="text-xs">Add a 5-DOF kit or components to proceed.</p>
+                    </div>
+                `;
+            } else {
+                cartItemsContainer.innerHTML = cart.map(item => `
+                    <div class="p-4 rounded-xl border border-surface-border bg-surface-base flex items-center justify-between gap-3 shadow-sm">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-xs text-ink-primary line-clamp-1">${item.name}</h4>
+                            <div class="font-mono text-xs text-cinnamon-500 font-semibold">₹${item.price.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-1.5 bg-white border border-surface-border rounded-lg p-1">
+                                <button onclick="updateQuantity(${item.id}, -1)" class="w-5 h-5 rounded hover:bg-surface-muted flex items-center justify-center text-xs font-bold">-</button>
+                                <span class="font-mono text-xs font-bold w-4 text-center">${item.quantity}</span>
+                                <button onclick="updateQuantity(${item.id}, 1)" class="w-5 h-5 rounded hover:bg-surface-muted flex items-center justify-center text-xs font-bold">+</button>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-ink-muted hover:text-red-500 transition-colors p-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function toggleCart(open) {
+            if (open) {
+                cartDrawer.classList.remove('pointer-events-none');
+                cartBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                cartContent.classList.remove('translate-x-full');
+            } else {
+                cartBackdrop.classList.add('opacity-0', 'pointer-events-none');
+                cartContent.classList.add('translate-x-full');
+                setTimeout(() => {
+                    cartDrawer.classList.add('pointer-events-none');
+                }, 300);
+            }
+        }
+
+        // QUICK VIEW MODAL
+        function openQuickView(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            quickViewContent.innerHTML = `
+                <div class="flex items-center gap-3 pb-4 border-b border-surface-border">
+                    <div class="w-12 h-12 rounded-xl bg-cinnamon-50 text-cinnamon-500 flex items-center justify-center">
+                        <i data-lucide="${product.icon}" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-mono font-bold text-cinnamon-500 uppercase">${product.tag}</span>
+                        <h3 class="font-extrabold text-lg text-ink-primary">${product.name}</h3>
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-xs leading-relaxed text-ink-secondary">
+                    <div>
+                        <h4 class="font-bold text-ink-primary mb-1">Product Description</h4>
+                        <p>${product.desc}</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-surface-base border border-surface-border font-mono">
+                        <h4 class="font-bold text-ink-primary mb-1">Technical Specifications</h4>
+                        <p class="text-ink-secondary leading-relaxed">${product.specs}</p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-surface-border">
+                        <span class="text-sm font-mono font-bold text-ink-primary">₹${product.price.toLocaleString('en-IN')}</span>
+                        <button onclick="addToCart(${product.id}); closeQuickView();" class="px-5 py-2.5 rounded-xl bg-cinnamon-500 hover:bg-cinnamon-600 text-white font-semibold flex items-center gap-2 shadow-md">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (window.lucide) lucide.createIcons();
+
+            quickViewModal.classList.remove('opacity-0', 'pointer-events-none');
+            quickViewCard.classList.remove('scale-95');
+        }
+
+        function closeQuickView() {
+            quickViewModal.classList.add('opacity-0', 'pointer-events-none');
+            quickViewCard.classList.add('scale-95');
+        }
+
+        // CHECKOUT MODAL
+        function openCheckout() {
+            if (cart.length === 0) {
+                alert("Your cart is empty! Please add hardware products before checking out.");
+                return;
+            }
+
+            toggleCart(false);
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('checkout-total-display').textContent = `₹${total.toLocaleString('en-IN')}`;
+            document.getElementById('checkout-ref').textContent = `CR-${Math.floor(100000 + Math.random() * 900000)}`;
+
+            checkoutModal.classList.remove('opacity-0', 'pointer-events-none');
+            checkoutCard.classList.remove('scale-95');
+        }
+
+        function closeCheckout() {
+            checkoutModal.classList.add('opacity-0', 'pointer-events-none');
+            checkoutCard.classList.add('scale-95');
+        }
+
+        function handleOrderSubmit(e) {
+            e.preventDefault();
+            
+            const body = document.getElementById('checkout-modal-body');
+            body.innerHTML = `
+                <div class="text-center py-8 space-y-4">
+                    <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                        <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="font-extrabold text-xl text-ink-primary">Order Successfully Placed!</h3>
+                    <p class="text-xs text-ink-secondary max-w-sm mx-auto leading-relaxed">
+                        Thank you for ordering with Cinnamon Robotics. Our team will verify your institutional purchase order and dispatch your arm kit.
+                    </p>
+                    <button onclick="closeCheckout(); resetCart();" class="px-6 py-2.5 rounded-xl bg-surface-dark text-white font-semibold text-xs transition-colors">
+                        Return to Portal
+                    </button>
+                </div>
+            `;
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function resetCart() {
+            cart = [];
+            updateCartUI();
+        }
+    </script>
+</body>
+</html>
